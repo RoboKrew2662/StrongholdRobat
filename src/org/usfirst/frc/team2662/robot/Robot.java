@@ -2,6 +2,8 @@
 package org.usfirst.frc.team2662.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -24,6 +26,17 @@ public class Robot extends IterativeRobot {
 
     Command autonomousCommand;
     SendableChooser chooser;
+    
+    //Motor Controller
+    Victor frontRight = new Victor(0);
+    Victor frontLeft = new Victor(1);
+    Victor backRight = new Victor(2);
+    Victor backLeft = new Victor(3);
+    
+    //Driver Controls
+    Joystick driver = new Joystick(1);
+    double xAxis = driver.getX();
+    double yAxis = driver.getY();
 
     /**
      * This function is run when the robot is first started up and should be
@@ -97,6 +110,14 @@ public class Robot extends IterativeRobot {
      */
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
+        
+        frontRight.set(yAxis - xAxis);
+        backRight.set(yAxis - xAxis);
+        frontLeft.set(yAxis + xAxis);
+        backLeft.set(yAxis + xAxis);
+        
+        System.out.println("X Axis: " + xAxis + "; Y Axis:" + yAxis + ";");
+        
     }
     
     /**
