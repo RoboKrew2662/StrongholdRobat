@@ -4,6 +4,8 @@ package org.usfirst.frc.team2662.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.buttons.Button;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -28,16 +30,35 @@ public class Robot extends IterativeRobot {
     SendableChooser chooser;
     
     //Motor Controller
-    Victor frontRight = new Victor(0);
-    Victor frontLeft = new Victor(1);
-    Victor backRight = new Victor(2);
-    Victor backLeft = new Victor(3);
+    public Victor frontRight = new Victor(2);
+    public Victor frontLeft = new Victor(0);
+    public Victor backRight = new Victor(3);
+    public Victor backLeft = new Victor(1);
+    
+    //Arm Controller
+    public Victor armController = new Victor(4);
     
     //Driver Controls
-    Joystick driver = new Joystick(1);
-    double xAxis = driver.getX();
-    double yAxis = driver.getY();
-
+    //Get Controls 
+    Joystick driver = new Joystick(0);
+    Button slow = new JoystickButton(driver, 1 );
+    Button up = new JoystickButton(driver, 3 );
+    Button down = new JoystickButton(driver, 2 );
+    Button forward = new JoystickButton(driver, 6);
+    Button backward = new JoystickButton(driver, 7);
+    	
+    //Define Variables 
+   	double xAxis;  //These are for the drive function
+   	double yAxis;
+   	double zAxis;
+   	
+   	public double rightCorrection = .95;
+   	
+   	boolean slowSpeed;
+   	
+   	boolean armUp = false;
+   	boolean armDown = false; 
+    	
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -85,7 +106,9 @@ public class Robot extends IterativeRobot {
 			autonomousCommand = new ExampleCommand();
 			break;
 		} */
-    	
+    	//jhfgjhgf obst
+        
+        
     	// schedule the autonomous command (example)
         if (autonomousCommand != null) autonomousCommand.start();
     }
@@ -111,12 +134,58 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
         
-        frontRight.set(yAxis - xAxis);
-        backRight.set(yAxis - xAxis);
-        frontLeft.set(yAxis + xAxis);
-        backLeft.set(yAxis + xAxis);
+        //Nurrr da currrrd        
         
-        System.out.println("X Axis: " + xAxis + "; Y Axis:" + yAxis + ";");
+        //Drive Function
+        zAxis = (-driver.getZ() + 1)/2;
+                                           // <---  Dank CopyPasta #1
+        if(slow.get()){
+        	yAxis = (driver.getY())*zAxis;
+	        xAxis = -(driver.getX())*zAxis;
+	        slowSpeed = false;
+        }else{
+                                           // <---  Dank CopyPasta #2
+	        yAxis = (driver.getY());
+	        xAxis = -(driver.getX());
+	        slowSpeed = false;
+        }
+        
+        frontRight.set((yAxis - xAxis)*rightCorrection);
+        backRight.set((yAxis - xAxis));
+        frontLeft.set(-(yAxis + xAxis)*rightCorrection);
+        backLeft.set(-(yAxis + xAxis));
+        
+        System.out.println("Slow: " + slowSpeed);
+        
+        		//Move Forwaards and Backwards
+        if(backward.get()){
+        	frontRight.set(rightCorrection * zAxis);
+            backRight.set(rightCorrection * zAxis);
+            frontLeft.set(-(1 * zAxis));
+            backLeft.set(-(1 * zAxis));
+        }
+         
+        if(forward.get()){
+        	frontRight.set(-(1 * zAxis)*rightCorrection);
+            backRight.set(-(1 * zAxis)*rightCorrection);
+            frontLeft.set((1 * zAxis));
+            backLeft.set((1 * zAxis));
+        }
+        
+        //Arm Contrololololol Function
+        if(up.get()) {
+        	armController.set(1);
+        	armUp = true;
+        	armDown = false;
+        }else if(down.get()){	
+            armController.set(-1);
+            armDown = true;	
+            armUp = false;
+        }else{
+        	armController.set(0);
+        }
+              
+        System.out.println(armController);
         
     }
     
