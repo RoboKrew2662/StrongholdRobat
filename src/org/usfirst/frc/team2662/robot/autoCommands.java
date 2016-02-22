@@ -7,7 +7,9 @@ public class autoCommands {
 	public void obstacle1(){
 		
 	}
+
 	
+	//Functions used in Autonomous mode
 	public void turnLeft(int time, double speed){
 		time = 5;
 		int count = time*1000;
